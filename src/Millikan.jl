@@ -140,6 +140,7 @@ function runSim_Efield_Off(p::Oil_Particle,env::Environment, dt::Float64, steps:
     p.acc = [0,0,0]
     getInfo(p)
     pos_history = zeros(Float64, 3, steps)
+    vel_history = zeros(Float64, 3, steps)
     time_steps = zeros(Float64,steps)
     dt_accum = 0.0
     i = 1
@@ -147,7 +148,8 @@ function runSim_Efield_Off(p::Oil_Particle,env::Environment, dt::Float64, steps:
         past_vel_y = p.vel[2]
         RK4!(p,env, dt)
         vel_error = calcErrorPorc(past_vel_y, p.vel[2])
-        pos_history[:,i] .= p.pos 
+        pos_history[:,i] .= p.pos
+        vel_history[:,i] .= p.vel
         time_steps[i] = dt_accum
         dt_accum += dt
         #println(dt_accum, "|", p.pos)
@@ -158,7 +160,7 @@ function runSim_Efield_Off(p::Oil_Particle,env::Environment, dt::Float64, steps:
     p.velocity_t = p.vel
     p.radius_theoric = sqrt((9*env.eta*norm(p.velocity_t))/(2*norm(env.g)*(env.rho_oil - env.rho_air)))
 
-    return pos_history, time_steps
+    return pos_history, time_steps, vel_history
 
 end
 

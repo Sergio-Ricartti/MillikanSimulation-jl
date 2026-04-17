@@ -2,6 +2,7 @@ module Data_Process
 
 export data_process
 export plotter
+export plot_vels
 using JLD2
 using Plots
 
@@ -14,6 +15,37 @@ function data_process(ite::Integer)
 
 (tray,particle,env1,dt_steps) = Read_data(ite)
 
+end
+function plot_vels(vels::Vector{Vector{Float64}}, time:: Vector{Vector{Float64}},  radius:: Vector{Float64})
+    
+    name = "velocity_vs_time.png"
+    colores = [:crimson,:aquamarine4,:darkmagenta,:gray16]
+    plt = plot(time[1], vels[1],
+                title = "Velocidades de caída de tres partículas diferentes",
+                ylabel = "Velocidad de caída",
+                xlabel = " Tiempo (s)",
+                color = colores[1],
+                label = "Radio = $(radius[1])",
+                legend = :bottomright)
+    for i in 2:3
+        plot!(time[i], vels[i],
+                color = colores[i],
+                label = "Radio = $(radius[i])")
+    end
+    scatter!([time[1][end]], [vels[1][end]],
+                color = colores[4],
+                marker = :circle,
+                ms = 2,
+                label = "Velocidad Terminal")
+    for i in 2:3
+        scatter!([time[i][end]], [vels[i][end]],
+                    color = colores[4],
+                    marker = :circle,
+                    ms = 2,
+                    label = "")
+    end
+    filepath = joinpath(DIRECTORY,"images", name)
+    savefig(plt, filepath)
 end
 
 function plotter(charges)
