@@ -11,7 +11,7 @@ using Distributions
 function run_test()
 number_part = 1000
 charges_acum = zeros(number_part)
-tracked_part = [1,50,100]
+tracked_part = collect(25.0:25.0:number_part)
 tracked_vels = Vector{Vector{Float64}}()
 tracked_time = Vector{Vector{Float64}}()
 tracked_r = Vector{Float64}()

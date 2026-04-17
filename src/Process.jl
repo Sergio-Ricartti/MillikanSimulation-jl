@@ -46,6 +46,36 @@ function plot_vels(vels::Vector{Vector{Float64}}, time:: Vector{Vector{Float64}}
     end
     filepath = joinpath(DIRECTORY,"images", name)
     savefig(plt, filepath)
+    name = "velocity_vs_radius.png"
+    colores = [:lightslateblue, :dodgerblue2]
+    vels_t = [v[end] for v in vels]
+    Drho = 8.86e2-1.29
+    g = 9.81
+    eta = 1.81e-5
+    r_teo = range(minimum(radius), maximum(radius), length=200)
+    vel_teo = (2 .* (Drho) .* g .* r_teo.^2) ./ (9 .* eta)
+    plt = plot(r_teo,vel_teo,
+            color = colores[2],
+            lw = 2,
+            label = "Vf = 2r²Δρg/9η")
+    scatter!([radius[1]], [vels[1][end]],
+                title = "Velocidad terminal contra radio",
+                ylabel = "Velocidad terminal",
+                xlabel = "Radio",
+                color = colores[1],
+                marker = :circle,
+                ms = 3,
+                label = "Datos simulados N=40",
+                legend = :topleft)
+    for i in 2:40
+        scatter!([radius[i]], [vels[i][end]],
+                    color = colores[1],
+                    marker = :circle,
+                    ms = 3,
+                    label = "")
+    end
+    filepath = joinpath(DIRECTORY,"images", name)
+    savefig(plt,filepath)
 end
 
 function plotter(charges)
@@ -56,14 +86,12 @@ function plotter(charges)
                 title = "Cargas de particulas", 
                 marker_z = charges, 
                 color = :viridis, 
-                ylabel = "Carga Experimental", 
-                xlabel = "Carga Asignada (n)",
-                colorbar = true)
+                ylabel = "Número de gota", 
+                xlabel = "Carga Asignada (n)",)
 
     filepath = joinpath(DIRECTORY,"images", name)
     savefig(plt, filepath)
 end
-
 
 function get_data(filepath::String, retrieve::String)
     data = jldopen(filepath, "r") do file
