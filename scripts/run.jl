@@ -11,6 +11,7 @@ using Distributions
 function run_test()
 number_part = 1000
 charges_acum = zeros(number_part)
+real_charge = 1.602e-19
 tracked_part = collect(25.0:25.0:number_part)
 tracked_vels = Vector{Vector{Float64}}()
 tracked_time = Vector{Vector{Float64}}()
@@ -30,7 +31,7 @@ Oil_drop = Oil_Particle(r = radius_rand, chargeQ = charge)
 Env = Environment()
 (trayectory, time_st, vel_hist)= runSim_Efield_Off(Oil_drop,Env, 1e-6, 1000,1e-4)
 #saveData(trayectory, Oil_drop, Env, time_st)
-runSim_Efield_on(Oil_drop,Env, 1e-6, 1000,1e-4, 500.00)
+runSim_Efield_on(Oil_drop,Env, 1e-6, 1000,1e-4, 5000.00)
 
 if n in tracked_part
     mask = time_st .> 0
@@ -50,11 +51,12 @@ println("Real Radius: ", Oil_drop.r, " | Exp Radius: ", Oil_drop.radius_theoric,
 println("Real Charge: ", Oil_drop.chargeQ, " | Exp Charge: ", Oil_drop.charge_theoric," | % =",ErrorP_charge,"%")
 println("--------------------------------------------")
 #data_process(n)
-charges_acum[n] = Oil_drop.charge_theoric/Env.charge_val
+charges_acum[n] = Oil_drop.charge_theoric
 end
-
+charge_teoric = charges_acum / real_charge
 plot_vels(tracked_vels,tracked_time,tracked_r)
-plotter(charges_acum)
+plotter(charge_teoric)
+regression(charges_acum)
 
 end
 

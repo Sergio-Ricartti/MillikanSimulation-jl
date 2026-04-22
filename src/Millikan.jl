@@ -44,7 +44,7 @@ eta::Float64 = 1.81e-5                      #Pa*s
 rho_oil::Float64 = 8.86e2                   #kg/m^3
 rho_air::Float64 = 1.29                     #kg/m^3
 charge_val::Float64 = 1.6e-19               #C
-distance_d::Vector{Float64} = [0,1e-4,0]    #m - Distance between plates is 0.1mm (Millikan., 1913)
+distance_d::Vector{Float64} = [0,0.016,0]    #m - Distance between plates is 0.1mm (Millikan., 1913)
 end
 
 #metodo iterativo de euler
@@ -165,7 +165,7 @@ function runSim_Efield_Off(p::Oil_Particle,env::Environment, dt::Float64, steps:
 end
 
 function runSim_Efield_on(p::Oil_Particle, env::Environment, dt::Float64, steps::Int, error::Float64, volt::Float64)
-    vel_error = 1.0
+    vel_error = 0.01
     i = 1
     p.voltage = volt #V
     p.pos = [0.0,1e-5,0.0]

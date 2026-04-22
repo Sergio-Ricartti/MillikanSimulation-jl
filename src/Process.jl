@@ -3,8 +3,10 @@ module Data_Process
 export data_process
 export plotter
 export plot_vels
+export regression
 using JLD2
 using Plots
+using Statistics
 
 include("../src/Millikan.jl")
 using .Millikan
@@ -92,7 +94,40 @@ function plotter(charges)
     filepath = joinpath(DIRECTORY,"images", name)
     savefig(plt, filepath)
 end
+function regression(charges::Vector{Float64})
+    step = length(charges) ÷ 40  
+    charges = charges[1:step:end] # Se tomarán solamente 40 cargas de 1000 (lo cual se hizo simplemente para graficar)
+    charges = sort(charges) # Se ordenan los datos de menor a mayor 
+    diffs = diff(charges)
+    diffs_filtered = filter(d -> d >= 0.5e-19, diffs) # Se descartan diferencias menores a 0.5e-19
+    e_est = median(diffs_filtered) # La mediana nos dará un valor de estimación principal para la carga elemental
+    println("Valor de carga estimada: ", e_est, " C")
+    n = round.(charges ./ e_est) # Se le asigna una n a cada gota
 
+    # Regresión lineal forzada al origen (q = e*n)
+    e_exp = sum(charges .* n)/sum(n .^ 2) # Solución analítica: e = sum(q*n) / sum(n^2)
+    println("Valor simulado de e: ", e_exp, " C")
+    println("Error %: ", round(abs(e_exp - 1.602e-19)/1.602e-19 * 100,digits = 3), " %")
+    # Gráfica
+    name = "Line_regression.png"
+    plt = scatter(n,charges,
+                    title = "Valor de e simulado por regresión lineal",
+                    xlabel = "Múltiplo asignado (n)",
+                    ylabel = "Carga teórica (C)",
+                    label = "Cargas simuladas",
+                    color = :aquamarine4,
+                    marker = :circle,
+                    ms = 4,
+                    legend = :topleft)
+    n_range = 1:maximum(n)
+    e_exp = round(e_exp,sigdigits=4)
+    plot!(plt, n_range, e_exp .* n_range,
+            label = "e = $e_exp C",
+            color = :crimson,
+            linewidth = 2)
+    filepath = joinpath(DIRECTORY,"images", name)
+    savefig(plt, filepath)
+end
 function get_data(filepath::String, retrieve::String)
     data = jldopen(filepath, "r") do file
     return file[retrieve]
